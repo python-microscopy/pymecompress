@@ -1,5 +1,5 @@
 package:
-  name: pyme-compress       # lower case name of package, may contain '-' but no spaces
+  name: pymecompress       # lower case name of package, may contain '-' but no spaces
   version: 0.1    # version of package. Should use the PEP-386 verlib
                       # conventions. Note that YAML will interpret
                       # versions like 1.0 as floats, meaning that 1.0 will
