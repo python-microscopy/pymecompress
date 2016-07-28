@@ -26,5 +26,5 @@ if __name__ == '__main__':
     import setuptools
     from numpy.distutils.core import setup
     conf = configuration(top_path='').todict()
-    conf['entry_points'] = entry_points
+    #conf['entry_points'] = entry_points
     setup(**conf)
