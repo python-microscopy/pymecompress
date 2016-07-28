@@ -1,6 +1,6 @@
 import sys
 import os
-import setuptools
+#import setuptools
 
 if sys.platform == 'darwin':#MacOS
     linkArgs = []
