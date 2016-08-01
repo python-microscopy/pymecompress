@@ -26,6 +26,8 @@
 #define NUMITERS 10
 #define NUMITERS_1 1000
 
+#ifndef __AVX__
+/* use slower code
 /* square root quantize data, with a given offset and scale*/
 void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
 {
@@ -38,10 +40,11 @@ void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float s
     }
 }
 
+#else
 /* square root quantize data, with a given offset and scale
 uses avx command set to process 16 values in parallel
 */
-void quantize_u16_avx( uint16_t * data, uint8_t * out, int size, float offset, float scale)
+void quantize_u16(uint16_t * data, uint8_t * out, int size, float offset, float scale)
 {
     //float qs = 1.0/scale;
     int i = 0;
@@ -105,3 +108,5 @@ void quantize_u16_avx( uint16_t * data, uint8_t * out, int size, float offset, f
         //out[i] = qs*sqrtf(data[i] - offset);
     }
 }
+
+#endif

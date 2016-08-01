@@ -10,7 +10,7 @@ cdef extern from "huffman.h":
 
 cdef extern from "quantize.h":
     void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale) nogil
-    void quantize_u16_avx( uint16_t * data, uint8_t * out, int size, float offset, float scale) nogil
+    #void quantize_u16_avx( uint16_t * data, uint8_t * out, int size, float offset, float scale) nogil
     
 @cython.boundscheck(False)    
 def HuffmanCompress(unsigned char[:] data):
@@ -30,7 +30,7 @@ def HuffmanCompressQuant(unsigned short[:] data, float offset, float scale):
     cdef unsigned char [:] qv = quant
     cdef int dsize = data.shape[0]
     with nogil:
-        quantize_u16_avx(&data[0], &qv[0], dsize, offset, scale)
+        quantize_u16(&data[0], &qv[0], dsize, offset, scale)
         nb = Huffman_Compress(&qv[0], &ov[0], dsize)
     return out[:nb]
 
