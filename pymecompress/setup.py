@@ -16,7 +16,7 @@ if False: #sys.platform == 'win32' and not os.environ.get('CC', '') == 'mingw':
 else:
     extra_include_dirs = []
 
-import cython_numpy_monkey
+#import cython_numpy_monkey
 #import setuptools
 
 #from Cython.Distutils import build_ext
