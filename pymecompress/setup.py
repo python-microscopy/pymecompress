@@ -6,20 +6,23 @@ if sys.platform == 'darwin':#MacOS
     linkArgs = []
 else:
     linkArgs = ['-static-libgcc']
-	
+
 
 #windows VC++ has really shocking c standard support so we need to include
 #custom stdint.h and intypes.h files from https://code.google.com/archive/p/msinttypes
 #print os.environ.get('CC', 'foo')
 if False: #sys.platform == 'win32' and not os.environ.get('CC', '') == 'mingw':
-	extra_include_dirs = ['win_incl']
+    extra_include_dirs = ['win_incl']
 else:
-	extra_include_dirs = []
+    extra_include_dirs = []
 
-#from PYME.misc import cython_numpy_monkey
+#import cython_numpy_monkey
 #import setuptools
 
 #from Cython.Distutils import build_ext
+
+
+
 
 #############
 # Monkey-patch distutils to not link MSVCR90
@@ -82,7 +85,7 @@ def configuration(parent_package = '', top_path = None):
     config.add_extension('bcl',
         sources=['bcl.pyx', 'src/huffman.c', 'quantize.c'],
         include_dirs = ['src', get_numpy_include_dirs()] + extra_include_dirs,
-	extra_compile_args = ['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
+    extra_compile_args = ['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
         extra_link_args=linkArgs)
 
     return config
@@ -90,13 +93,14 @@ def configuration(parent_package = '', top_path = None):
 if __name__ == '__main__':
     from numpy.distutils.core import setup
     setup(description = 'python wrapper for BCL',
-    	author = 'David Baddeley',
-       	author_email = 'david.baddeley@yale.edu',
-       	url = '',
-       	long_description = """
+        author = 'David Baddeley',
+        author_email = 'david.baddeley@yale.edu',
+        url = '',
+        long_description = """
 Python wrapper for the Basic compression libarary
 """,
           license = "BSD",
+          #cmdclass={'build_ext': build_ext},
           **configuration(top_path='').todict()
           )
 

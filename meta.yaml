@@ -1,6 +1,6 @@
 package:
   name: pymecompress       # lower case name of package, may contain '-' but no spaces
-  version: 0.1    # version of package. Should use the PEP-386 verlib
+  version: 0.1.1    # version of package. Should use the PEP-386 verlib
                       # conventions. Note that YAML will interpret
                       # versions like 1.0 as floats, meaning that 1.0 will
                       # be the same as 1. To avoid this, always put the
@@ -116,6 +116,7 @@ requirements:
     - python
     - numpy x.x
     - matplotlib
+    - cython
     - mingw  [win]
   # Packages required to run the package. These are the dependencies that
   # will be installed automatically whenever the package is installed.

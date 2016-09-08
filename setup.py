@@ -20,7 +20,7 @@ def configuration(parent_package='',top_path=None):
     #config.make_config_py()
     #config.get_version('PYME/version.py')
     return config
-}
+
 
 if __name__ == '__main__':
     import setuptools
