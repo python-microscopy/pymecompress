@@ -21,7 +21,7 @@ else:
 
 #from Cython.Distutils import build_ext
 
-
+from Cython.Build import cythonize
 
 
 #############
@@ -80,13 +80,27 @@ numpy.distutils.mingw32ccompiler.Mingw32CCompiler.link = link
 
 def configuration(parent_package = '', top_path = None):
     from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
-    config = Configuration('pymecompress', parent_package, top_path)
+    from numpy.distutils.core import Extension
+    from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
+    
+    cur_dir = os.path.dirname(__file__)
 
-    config.add_extension('bcl',
-        sources=['bcl.pyx', 'src/huffman.c', 'quantize.c'],
-        include_dirs = ['src', get_numpy_include_dirs()] + extra_include_dirs,
-    extra_compile_args = ['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
-        extra_link_args=linkArgs)
+    ext = Extension(name='.'.join([parent_package, 'pymecompress', 'bcl']),
+                    sources=[os.path.join(cur_dir, 'bcl.pyx'), os.path.join(cur_dir, 'src/huffman.c'), os.path.join(cur_dir, 'quantize.c')],
+                    include_dirs=['src',] + get_numpy_include_dirs() + extra_include_dirs,
+                    extra_compile_args=['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
+                    extra_link_args=linkArgs)
+
+    config = Configuration('pymecompress', parent_package, top_path, ext_modules=cythonize([ext]))
+    
+    
+    # config = Configuration('pymecompress', parent_package, top_path)
+    #
+    # config.add_extension('bcl',
+    #     sources=['bcl.pyx', 'src/huffman.c', 'quantize.c'],
+    #     include_dirs = ['src', get_numpy_include_dirs()] + extra_include_dirs,
+    # extra_compile_args = ['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
+    #     extra_link_args=linkArgs)
 
     return config
 
