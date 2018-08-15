@@ -111,6 +111,11 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
 
 //#endif
 
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+/* Test for GCC > 3.2.0 */
+#if GCC_VERSION > 40800
+
 void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
 {
     if (__builtin_cpu_supports ("avx"))
@@ -121,3 +126,20 @@ void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float s
         quantize_u16_noavx(data, out, size, offset, scale);
     }
 }
+
+#else
+    #warning Using an old version of GCC - runtime avx detection disabled and compiling for native architecture. Please use GCC > 4.8
+    #ifndef __AVX__
+        void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
+        {
+            quantize_u16_noavx(data, out, size, offset, scale);
+        }
+     #else
+        void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
+        {
+            quantize_u16_avx(data, out, size, offset, scale);
+        }
+     #endif
+
+
+#endif
