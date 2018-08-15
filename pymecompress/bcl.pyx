@@ -3,12 +3,12 @@ from cython.view cimport array as cvarray
 cimport cython
 from libc.stdint cimport uint16_t, uint8_t
 
-cdef extern from "huffman.h":
+cdef extern from "src/huffman.h":
     int Huffman_Compress( unsigned char *inp, unsigned char *out, unsigned int insize ) nogil
     int Huffman_Compress_( unsigned char *inp, unsigned char *out, unsigned int insize ) nogil
     void Huffman_Uncompress( unsigned char *inp, unsigned char *out, unsigned int insize, unsigned int outsize ) nogil
 
-cdef extern from "quantize.h":
+cdef extern from "src/quantize.h":
     void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale) nogil
     #void quantize_u16_avx( uint16_t * data, uint8_t * out, int size, float offset, float scale) nogil
     
