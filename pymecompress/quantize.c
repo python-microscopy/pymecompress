@@ -113,8 +113,8 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
-/* Test for GCC > 3.2.0 */
-#if GCC_VERSION > 40800
+/* Test for GCC > 3.2.0  - note that __builtin_cpu_supports is broken on OSX, hence we have to exclude clang*/
+#if (GCC_VERSION > 40800) && !defined(__clang__)
 
 void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
 {
