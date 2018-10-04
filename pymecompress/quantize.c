@@ -46,7 +46,7 @@ uses avx command set to process 16 values in parallel
 */
 void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, float scale)
 {
-    //float qs = 1.0/scale;
+    float qs = 1.0/scale;
     int i = 0;
 
     __m256 x, x1, xs;
@@ -56,7 +56,7 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
     __m256 offs;
     __m256 sc;
     offs = _mm256_set1_ps(offset);
-    sc = _mm256_set1_ps(scale);
+    sc = _mm256_set1_ps(qs);
 
     /*process 16 values at a time*/
 
