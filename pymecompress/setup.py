@@ -78,6 +78,12 @@ numpy.distutils.mingw32ccompiler.Mingw32CCompiler.link = link
 # End monkey patching
 #####################
 
+####
+# Python3 windows patch: (here for now to document, should ideally create a better workaround).
+#
+# modify numpy.distutils.exec_command._exec_command to add line: command[0] = find_executable(command[0])
+#
+
 def configuration(parent_package = '', top_path = None):
     from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
     from numpy.distutils.core import Extension
