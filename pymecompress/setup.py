@@ -85,17 +85,17 @@ numpy.distutils.mingw32ccompiler.Mingw32CCompiler.link = link
 # modify numpy.distutils.exec_command._exec_command to add line: command[0] = find_executable(command[0])
 #
 
-from numpy.distutils import exec_command
+import numpy.distutils.exec_command
 
 def _monkey_patch_exec_command(fcn):
     def _exec_command(command, use_shell=None, use_tee=None, **env):
-        command[0] = exec_command.find_executable(command[0])
-        fcn(command, use_shell=use_shell, use_tee=use_tee, **env)
+        command[0] = numpy.distutils.exec_command.find_executable(command[0])
+        return fcn(command, use_shell=use_shell, use_tee=use_tee, **env)
         
     return _exec_command
     
 if sys.platform == 'win32':
-    exec_command._exec_command = _monkey_patch_exec_command(exec_command._exec_command)
+    numpy.distutils.exec_command._exec_command = _monkey_patch_exec_command(numpy.distutils.exec_command._exec_command)
 
 ### End exec_command patching
 
