@@ -80,9 +80,22 @@ numpy.distutils.mingw32ccompiler.Mingw32CCompiler.link = link
 
 ####
 # Python3 windows patch: (here for now to document, should ideally create a better workaround).
+# NB - seems to also be needed for recent python 2 (is this a numpy version thing instead?)
 #
 # modify numpy.distutils.exec_command._exec_command to add line: command[0] = find_executable(command[0])
 #
+
+from numpy.distutils import exec_command
+
+def _monkey_patch_exec_command(fcn):
+    def _exec_command(command, use_shell=None, use_tee=None, **env):
+        command[0] = exec_command.find_executable(command[0])
+        fcn(command, use_shell=use_shell, use_tee=use_tee, **env)
+    
+if sys.platform == 'win32':
+    exec_command._exec_command = _monkey_patch_exec_command(exec_command._exec_command)
+
+### End exec_command patching
 
 def configuration(parent_package = '', top_path = None):
     from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
