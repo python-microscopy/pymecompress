@@ -3,7 +3,7 @@
 PYMECompress consists of three parts: 
 
 - a fork of the Basic Compression Library originally by Marcus Geelnard, 
-modified to include a heavily optimized huffman coder (BCL license is avalable under pymecompress/doc/manual.pdf and would appear to be BSD compatible)
+modified to include a heavily optimized huffman coder (BCL license is avalable under pymecompress/bcl/doc/manual.pdf and would appear to be BSD compatible)
 
 - a fast, AVX optimized, quantizer to perform "within noise level" quantization of photon-limited images
 
