@@ -5,12 +5,12 @@ cimport cython
 from libc.stdint cimport uint16_t, uint8_t
 from cpython cimport PyObject_CheckBuffer, PyObject_GetBuffer, PyBuffer_Release, Py_buffer, PyObject, PyBUF_SIMPLE, PyBUF_C_CONTIGUOUS, PyBUF_F_CONTIGUOUS, PyBuffer_IsContiguous
 
-cdef extern from "src/huffman.h":
+cdef extern from "bcl/huffman.h":
     int Huffman_Compress( unsigned char *inp, unsigned char *out, unsigned int insize ) nogil
     int Huffman_Compress_( unsigned char *inp, unsigned char *out, unsigned int insize ) nogil
     void Huffman_Uncompress( unsigned char *inp, unsigned char *out, unsigned int insize, unsigned int outsize ) nogil
 
-cdef extern from "src/quantize.h":
+cdef extern from "quantize.h":
     void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale) nogil
     #void quantize_u16_avx( uint16_t * data, uint8_t * out, int size, float offset, float scale) nogil
     
