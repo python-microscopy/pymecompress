@@ -7,8 +7,8 @@ if sys.platform == 'darwin':#MacOS
 elif sys.platform == 'win32':
     linkArgs = ['-static-libgcc']
     
-    if sys.version_info[:2] == (3,6):
-        linkArgs.append('-l libpython36.lib')
+    if sys.version_info[0] == 3:
+        linkArgs.append('-l python3.lib')
 
 
 #windows VC++ has really shocking c standard support so we need to include
@@ -78,8 +78,7 @@ def link(self,
 
 numpy.distutils.mingw32ccompiler.Mingw32CCompiler.link = link
 
-# End monkey patching
-#####################
+
 
 ####
 # Python3 windows patch: (here for now to document, should ideally create a better workaround).
@@ -101,7 +100,42 @@ if sys.platform == 'win32':
     numpy.distutils.exec_command._exec_command = _monkey_patch_exec_command(numpy.distutils.exec_command._exec_command)
 
 ### End exec_command patching
+import subprocess
+from numpy.distutils.exec_command import find_executable
 
+#objdump is a .bat rather than a .exe in an anaconda build environment
+def _monkey_patch_dump_table(dll):
+    objdump = find_executable("objdump")
+    st = subprocess.Popen([objdump, "-p", dll], stdout=subprocess.PIPE)
+    return st.stdout.readlines()
+
+numpy.distutils.mingw32ccompiler.dump_table = _monkey_patch_dump_table
+
+# ditto for dlltool
+def _build_import_library_amd64():
+    out_exists, out_file = numpy.distutils.mingw32ccompiler._check_for_import_lib()
+    if out_exists:
+        numpy.distutils.mingw32ccompiler.log.debug('Skip building import library: "%s" exists', out_file)
+        return
+
+    # get the runtime dll for which we are building import library
+    dll_file = numpy.distutils.mingw32ccompiler.find_python_dll()
+    numpy.distutils.mingw32ccompiler.log.info('Building import library (arch=AMD64): "%s" (from %s)' %
+             (out_file, dll_file))
+
+    # generate symbol list from this library
+    def_name = "python%d%d.def" % tuple(sys.version_info[:2])
+    def_file = os.path.join(sys.prefix, 'libs', def_name)
+    numpy.distutils.mingw32ccompiler.generate_def(dll_file, def_file)
+
+    # generate import library from this symbol list
+    cmd = [find_executable("dlltool"), '-d', def_file, '-l', out_file]
+    subprocess.Popen(cmd)
+
+numpy.distutils.mingw32ccompiler._build_import_library_amd64 = _build_import_library_amd64
+
+# End monkey patching
+#####################
 def configuration(parent_package = '', top_path = None):
     from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
     from numpy.distutils.core import Extension
