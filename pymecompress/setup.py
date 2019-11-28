@@ -113,8 +113,8 @@ def configuration(parent_package = '', top_path = None):
                         
     
     ext = Extension(name=name,
-                    sources=[os.path.join(cur_dir, 'bcl.pyx'), os.path.join(cur_dir, 'src/huffman.c'), os.path.join(cur_dir, 'quantize.c')],
-                    include_dirs=['src',] + get_numpy_include_dirs() + extra_include_dirs,
+                    sources=[os.path.join(cur_dir, 'bcl.pyx'), os.path.join(cur_dir, 'bcl/huffman.c'), os.path.join(cur_dir, 'quantize.c')],
+                    include_dirs=['bcl',] + get_numpy_include_dirs() + extra_include_dirs,
                     extra_compile_args=['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
                     extra_link_args=linkArgs)
 
