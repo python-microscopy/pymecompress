@@ -10,7 +10,7 @@
 #include <math.h>
 //#include <x86intrin.h>
 #include <immintrin.h>
-#include "src/quantize.h"
+#include "quantize.h"
 
 #ifdef __AVX__
 #pragma message "AVX defined"
