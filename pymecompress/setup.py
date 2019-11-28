@@ -7,8 +7,8 @@ if sys.platform == 'darwin':#MacOS
 elif sys.platform == 'win32':
     linkArgs = ['-static-libgcc']
     
-    if sys.version_info[0] == 3:
-        linkArgs.append('-l python3.lib')
+    #if sys.version_info[0] == 3:
+    #    linkArgs.append('-l python3.lib')
 
 
 #windows VC++ has really shocking c standard support so we need to include
