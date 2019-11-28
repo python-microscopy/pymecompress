@@ -4,8 +4,11 @@ import os
 
 if sys.platform == 'darwin':#MacOS
     linkArgs = []
-else:
+elif sys.platform == 'win32':
     linkArgs = ['-static-libgcc']
+    
+    if sys.version_info[:2] == (3,6):
+        linkArgs.append('-l libpython36.lib')
 
 
 #windows VC++ has really shocking c standard support so we need to include
