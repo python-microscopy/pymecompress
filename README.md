@@ -15,11 +15,13 @@ Together they offer a single core throughput of ~500 -600MB/s
 ## Installation
 
 PYMEcompress is available as a conda package ("pymecompress") on the "david_baddeley" conda channel for python 2.7, 3.6 & 3.7
+if you don't use conda of want a package for a different python version (or if you want to play with the source) you will have to build from source.
     
 Because we use gcc compiler extensions for avx opcodes, we must use gcc/clang for compilation, regardless of platform.
-On OSX / linux, a standard `python setup.py install` or `python setup.py develop` should work.
 
-On Windows, you need to build first - i.e. :
+On OSX / linux, a standard `python setup.py install` or `python setup.py develop` should work. There is a small caveat here in that due to some setuptools/ numpy distutils complexity that I don't fully understand, you need to run `python setup.py develop` from the top-level directory, but `python setup.py install` from one directory down.
+
+On Windows, you need to build first so that you can pass the compiler flag to `python setup.py build` - i.e. :
 
     cd pymecompress
     python setup.py build --compiler=mingw32
