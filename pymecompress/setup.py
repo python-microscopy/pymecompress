@@ -2,9 +2,8 @@ import sys
 import os
 #import setuptools
 
-if sys.platform == 'darwin':#MacOS
-    linkArgs = []
-elif sys.platform == 'win32':
+linkArgs = []
+if sys.platform == 'win32':
     linkArgs = ['-static-libgcc']
     
     #if sys.version_info[0] == 3:
