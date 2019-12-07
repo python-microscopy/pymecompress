@@ -137,7 +137,6 @@ numpy.distutils.mingw32ccompiler._build_import_library_amd64 = _build_import_lib
 # End monkey patching
 #####################
 def configuration(parent_package = '', top_path = None):
-    from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
     from numpy.distutils.core import Extension
     from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
     
