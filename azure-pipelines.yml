@@ -85,13 +85,25 @@ jobs:
       versionSpec: '$(python.version)'
     displayName: 'Use Python $(python.version)'
 
-  - script: |
-      python -m pip install --upgrade pip
-      pip install -r requirements.txt
-    displayName: 'Install dependencies'
+  - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+    displayName: Add conda to PATH
 
   - script: |
-      python pymecompress/setup.py --compiler=mingw32
+      conda create --yes --quiet --name myEnvironment
+      call activate myEnvironment
+      conda install --yes --quiet --name myEnvironment python=%PYTHON_VERSION% numpy=1.14 mingw cython six
+    displayName: Create Anaconda environment
+
+  # - script: |
+  #     python -m pip install --upgrade pip
+  #     pip install -r requirements.txt
+  #   displayName: 'Install dependencies'
+
+  - script: |
+      python pymecompress/setup.py build_ext -i --compiler=mingw32
+    displayName: 'Build code'
+
+  - script: |
       python setup.py develop
       pip install pytest pytest-azurepipelines
       pytest
