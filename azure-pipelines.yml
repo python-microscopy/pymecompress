@@ -8,24 +8,26 @@ trigger:
 
 strategy:
   matrix:
-    linux_27:
+    linux:
       imageName: "ubuntu-16.04"
-      python.version: '2.7'
-    linux_36:
-      imageName: "ubuntu-16.04"
-      python.version: '3.6'
-    mac_27:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+    mac:
       imageName: "macos-10.13"
-      python.version: '2.7'
-    mac_36:
-      imageName: "macos-10.13"
-      python.version: '3.6'
-    windows_27:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+    windows:
       imageName: "vs2017-win2016"
-      python.version: '2.7'
-    windows_36:
-      imageName: "vs2017-win2016"
-      python.version: '3.6'
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
   maxParallel: 7
 
 pool:
