@@ -91,6 +91,7 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
+      python pymecompress/setup.py --compiler=mingw32
       python setup.py develop
       pip install pytest pytest-azurepipelines
       pytest
