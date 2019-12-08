@@ -100,10 +100,12 @@ jobs:
   #   displayName: 'Install dependencies'
 
   - script: |
+      call activate myEnvironment
       python pymecompress/setup.py build_ext -i --compiler=mingw32
     displayName: 'Build code'
 
   - script: |
+      call activate myEnvironment
       python setup.py develop
       pip install pytest pytest-azurepipelines
       pytest
