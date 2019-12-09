@@ -32,8 +32,8 @@ jobs:
 
   - script: |
       python setup.py develop
-      pip install pytest pytest-azurepipelines
-      pytest
+      pip install pytest pytest-azurepipelines pytest-cov
+      pytest --cov pymecompress --cov-report html
     displayName: 'pytest'
 
 - job:
