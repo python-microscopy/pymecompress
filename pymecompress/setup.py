@@ -154,15 +154,6 @@ def configuration(parent_package = '', top_path = None):
                     extra_link_args=linkArgs)
 
     config = Configuration('pymecompress', parent_package, top_path, ext_modules=cythonize([ext]))
-    
-    
-    # config = Configuration('pymecompress', parent_package, top_path)
-    #
-    # config.add_extension('bcl',
-    #     sources=['bcl.pyx', 'src/huffman.c', 'quantize.c'],
-    #     include_dirs = ['src', get_numpy_include_dirs()] + extra_include_dirs,
-    # extra_compile_args = ['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
-    #     extra_link_args=linkArgs)
 
     return config
 
@@ -176,7 +167,6 @@ if __name__ == '__main__':
 Python wrapper for the Basic compression libarary
 """,
           license = "BSD",
-          #cmdclass={'build_ext': build_ext},
           **configuration(top_path='').todict()
           )
 
