@@ -27,7 +27,7 @@ def test_loss_within_sigma():
     quantized = bcl.HuffmanDecompress(bcl.HuffmanCompressQuant(np.frombuffer(ground.data, dtype='uint16'), offset,
                                                                scale),
                                       int(ground.nbytes / 2)).reshape(ground.shape)
-    quantized = quantized.astype(float) ** 2 + offset
+    quantized = (quantized.astype(float) * scale) ** 2 + offset
 
     assert np.all(
         np.less_equal(np.abs(ground.astype(float) - quantized.squeeze().astype(float)),
