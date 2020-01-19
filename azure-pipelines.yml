@@ -1,0 +1,112 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- master
+jobs:
+- job:
+  displayName: 'ubuntu-latest'
+  pool:
+    vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+      #Python37:
+      #  python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: |
+      python setup.py develop
+      pip install pytest pytest-azurepipelines pytest-cov
+      pytest --cov pymecompress --cov-report html
+    displayName: 'pytest'
+
+- job:
+  displayName: macOS-10.13
+  pool:
+    vmImage: 'macOS-10.13'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+      #Python37:
+      #  python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: |
+      python setup.py develop
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: 'pytest'
+
+- job:
+  displayName: vs2017-win2016
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python36:
+        python.version: '3.6'
+      #Python37:
+      #  python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+
+  - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+    displayName: Add conda to PATH
+
+  - script: |
+      conda create --yes --quiet --name myEnvironment
+      call activate myEnvironment
+      conda install --yes --quiet --name myEnvironment python=%PYTHON_VERSION% numpy=1.14 mingw cython six
+    displayName: Create Anaconda environment
+
+  # - script: |
+  #     python -m pip install --upgrade pip
+  #     pip install -r requirements.txt
+  #   displayName: 'Install dependencies'
+
+  - script: |
+      call activate myEnvironment
+      python pymecompress/setup.py build_ext -i --compiler=mingw32
+    displayName: 'Build code'
+
+  - script: |
+      call activate myEnvironment
+      python setup.py develop
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: 'pytest'
