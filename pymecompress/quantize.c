@@ -36,7 +36,7 @@ void quantize_u16_noavx(uint16_t *data, uint8_t * out, int size, float offset, f
 
     for (i = 0; i < size; i++)
     {
-        out[i] = round(qs*sqrtf(data[i] - offset));
+        out[i] = (uint8_t) roundf(qs*sqrtf(data[i] - offset));
     }
 }
 
