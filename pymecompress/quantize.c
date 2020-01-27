@@ -36,7 +36,7 @@ void quantize_u16_noavx(uint16_t *data, uint8_t * out, int size, float offset, f
 
     for (i = 0; i < size; i++)
     {
-        out[i] = qs*sqrtf(data[i] - offset);
+        out[i] = (uint8_t) roundf(qs*sqrtf(data[i] - offset));
     }
 }
 
@@ -73,7 +73,7 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
         x1 = (__m256)_mm256_sub_ps(x, offs);
         xs = (__m256)_mm256_mul_ps(_mm256_mul_ps(_mm256_rsqrt_ps(x1),x1), sc);
         //xs = _mm256_mul_ps(_mm256_sqrt_ps(x1), sc);
-        xi = (__m256i)_mm256_cvttps_epi32 (xs);
+        xi = (__m256i)_mm256_cvtps_epi32 (xs);
         xp = xi;
         //xp = _mm256_packs_epi32 (xi, _mm256_set1_epi32 (0));
         //xp = _mm256_packs_epi16 (xp, _mm256_set1_epi16 (0));
@@ -94,7 +94,7 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
         x1 = (__m256)_mm256_sub_ps(x, offs);
         xs = (__m256)_mm256_mul_ps(_mm256_mul_ps(_mm256_rsqrt_ps(x1),x1), sc);
         //xs = _mm256_mul_ps(_mm256_sqrt_ps(x1), sc);
-        xi = (__m256i)_mm256_cvttps_epi32 (xs);
+        xi = (__m256i)_mm256_cvtps_epi32 (xs);
         xp = xi;
         //xp = _mm256_packs_epi32 (xi, _mm256_set1_epi32 (0));
         //xp2 = _mm256_extractf128_si256 (xp, 0);
