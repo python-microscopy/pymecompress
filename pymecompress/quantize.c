@@ -58,9 +58,8 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
     offs = _mm256_set1_ps(offset);
     sc = _mm256_set1_ps(qs);
 
-    /*process 16 values at a time*/
-
-    for (i = 0; i < size; i+=16)
+    /* process 16 values at a time - only do the aligned bit */
+    for (i = 0; i < (16*(size/16)); i+=16)
     {
         /* process first 8 values */
         t2 = _mm_load_si128((__m128i *) &(data[i]));
@@ -106,6 +105,12 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
         //out += 16
 
         //out[i] = qs*sqrtf(data[i] - offset);
+    }
+
+    //do the unaligned bit
+    for (; i < size; i++)
+    {
+        out[i] = (uint8_t) roundf(qs*sqrtf(data[i] - offset));
     }
 }
 
