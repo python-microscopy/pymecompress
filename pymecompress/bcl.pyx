@@ -60,7 +60,7 @@ def HuffmanCompressQuant(data, float offset, float scale):
     cdef int dsize = data.size
     
     out = np.zeros(int(dsize*1.01 + 320),'uint8')
-    quant = np.zeros(dsize, 'uint8')
+    quant = np.zeros(int(np.ceil(dsize/16.0)*16), 'uint8') #quantization output buffer needs to be a multiple of 16 bytes if using AVX quantization
     cdef unsigned char [:] ov = out
     cdef unsigned char [:] qv = quant
     
