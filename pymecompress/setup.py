@@ -154,6 +154,7 @@ def configuration(parent_package = '', top_path = None):
                     extra_link_args=linkArgs)
 
     config = Configuration('pymecompress', parent_package, top_path, ext_modules=cythonize([ext]))
+    config.get_version()
 
     return config
 
