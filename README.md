@@ -27,11 +27,9 @@ If you don't use conda of want a package for a different python version (or if y
 Because we use gcc compiler extensions for avx opcodes, we must use gcc/clang for compilation, regardless of platform.
 
 On OSX / linux, a standard `python setup.py install` or `python setup.py develop` should work.
-There is a small caveat here in that due to some setuptools/ numpy distutils complexity that I don't fully understand, you need to run `python setup.py develop` from the top-level directory, but `python setup.py install` from one directory down.
 
 On Windows, you need to install mingw and run the build step first so that you can pass the compiler flag to `python setup.py build` - i.e. :
 
-    cd pymecompress
     python setup.py build --compiler=mingw32
     python setup.py install
 
