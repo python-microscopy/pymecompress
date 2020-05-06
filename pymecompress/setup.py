@@ -135,39 +135,81 @@ numpy.distutils.mingw32ccompiler._build_import_library_amd64 = _build_import_lib
 
 # End monkey patching
 #####################
+
+#pre-compile cython (copied & adapted from skimage._build)
+def cython(pyx_files, working_path=''):
+    """Use Cython to convert the given files to C.
+    Parameters
+    ----------
+    pyx_files : list of str
+        The input .pyx files.
+    """
+    # Do not build cython files if target is clean
+    if len(sys.argv) >= 2 and sys.argv[1] == 'clean':
+        return
+
+    try:
+
+        from Cython.Build import cythonize
+    except ImportError:
+        # If cython is not found, the build will make use of
+        # the distributed .c or .cpp files if present
+       
+
+        print("Cython not found; falling back to pre-built bcl.c")
+    else:
+        from multiprocessing import cpu_count
+        pyx_files = [os.path.join(working_path, f) for f in pyx_files]
+
+        # Cython doesn't automatically choose a number of threads > 1
+        # https://github.com/cython/cython/blob/a0bbb940c847dfe92cac446c8784c34c28c92836/Cython/Build/Dependencies.py#L923-L925
+        cythonize(pyx_files, nthreads=cpu_count(),
+                  compiler_directives={'language_level': sys.version_info.major})
+
 def configuration(parent_package = '', top_path = None):
     from numpy.distutils.core import Extension
     from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
-    
-    cur_dir = os.path.dirname(__file__)
 
     if not parent_package == '':
         name = '.'.join([parent_package, 'pymecompress', 'bcl'])
     else:
         name = '.'.join(['pymecompress', 'bcl'])
-                        
     
-    ext = Extension(name=name,
-                    sources=[os.path.join(cur_dir, 'bcl.pyx'), os.path.join(cur_dir, 'bcl/huffman.c'), os.path.join(cur_dir, 'quantize.c')],
+    #cythonize pyx files
+    cython(['bcl.pyx',], working_path=os.path.abspath(os.path.dirname(__file__)))
+
+    config = Configuration('pymecompress', parent_package, top_path)
+    config.get_version()
+    
+    config.add_extension(name='bcl',
+                    #sources=[os.path.join(cur_dir, 'bcl.pyx'), os.path.join(cur_dir, 'bcl/huffman.c'), os.path.join(cur_dir, 'quantize.c')],
+                    sources=['bcl.c', 'bcl/huffman.c','quantize.c'],
                     include_dirs=['bcl',] + get_numpy_include_dirs() + extra_include_dirs,
                     extra_compile_args=['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
                     extra_link_args=linkArgs)
 
-    config = Configuration('pymecompress', parent_package, top_path, ext_modules=cythonize([ext]))
-    config.get_version()
+    
 
     return config
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    setup(description = 'python wrapper for BCL',
-        author = 'David Baddeley',
-        author_email = 'david.baddeley@yale.edu',
-        url = '',
-        long_description = """
-Python wrapper for the Basic compression libarary
-""",
+    
+    setup(description = 'Compression for photon-noise limited images which keeps losses within the Poisson noise envelope',
+          author = 'David Baddeley',
+          author_email = 'david.baddeley@yale.edu',
+          url = 'https://github.com/python-microscopy/pymecompress',
+          long_description = 'Compression for photon-noise limited images which keeps losses within the Poisson noise envelope',
           license = "BSD",
+          install_requires=['numpy'],
+          classifiers=[
+              'Development Status :: 3 - Alpha',
+              # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
+              'License :: OSI Approved :: BSD License', # Again, pick a license
+              'Programming Language :: Python :: 2.7', #Specify which pyhton versions that you want to support
+              'Programming Language :: Python :: 3.6',
+              'Programming Language :: Python :: 3.7',
+          ],
           **configuration(top_path='').todict()
-          )
+         )
 
