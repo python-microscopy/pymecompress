@@ -16,13 +16,13 @@ Together they offer a single core throughput of ~500 -600MB/s
 
 ## Installation
 
-### Using conda
+### conda
 
 Prebuilt binaries of PYMEcompress are available as a conda package (*pymecompress*) on the *david_baddeley* conda channel for python 2.7, 3.6 & 3.7, and installable via:
 
     conda install -c david_baddeley pymecompress
 
-### From source
+### source
 
 If you want to modify/contribute to the package you will have to build from source.
 
@@ -38,11 +38,11 @@ On Windows, you need to install mingw and run the build step first so that you c
 
 A suitable environment for building pymecompress using the following conda command `conda create -n <name> python=x.x numpy cython libpython m2w64-toolchain`
 
-### PIP
+### pip
 
 Installation via pip is also available:
 
     pip install pymecompress
 
 however you may need to first set up a build environment (gcc/mingw, as
-described for from-source installation) if we have yet to upload a distribution for your platform.
+described for source installation) if we have yet to upload a distribution for your platform.
