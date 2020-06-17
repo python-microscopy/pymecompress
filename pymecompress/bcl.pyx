@@ -1,5 +1,5 @@
 import numpy as np
-import six
+#import six
 from cython.view cimport array as cvarray
 cimport cython
 from libc.stdint cimport uint16_t, uint8_t
