@@ -22,13 +22,6 @@ Prebuilt binaries of PYMEcompress are available as a conda package (*pymecompres
 
     conda install -c david_baddeley pymecompress
 
-### PIP
-
-Installation via pip is also available:
-
-    pip install pymecompress
-
-
 ### From source
 
 If you want to modify/contribute to the package you will have to build from source.
@@ -44,3 +37,12 @@ On Windows, you need to install mingw and run the build step first so that you c
 
 
 A suitable environment for building pymecompress using the following conda command `conda create -n <name> python=x.x numpy cython libpython m2w64-toolchain`
+
+### PIP
+
+Installation via pip is also available:
+
+    pip install pymecompress
+
+however you may need to first set up a build environment (gcc/mingw, as
+described for from-source installation) if we have yet to upload a distribution for your platform.
