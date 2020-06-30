@@ -1,4 +1,8 @@
 # PYMECompress
+![testing](https://img.shields.io/azure-devops/tests/davidbaddeleynz/pyme-ci/1/master?logo=azuredevops)
+![conda](https://img.shields.io/conda/v/david_baddeley/pymecompress)
+![pypi](https://img.shields.io/pypi/v/pymecompress)
+![pyversions](https://img.shields.io/pypi/pyversions/pymecompress)
 
 Compression for photon-noise limited images which keeps losses within the Poisson noise envelope
 
@@ -36,7 +40,7 @@ On Windows, you need to install mingw and run the build step first so that you c
     python setup.py install
 
 
-A suitable environment for building pymecompress using the following conda command `conda create -n <name> python=x.x numpy cython libpython m2w64-toolchain`
+A suitable environment for building pymecompress can be created using the following conda command `conda create -n <name> python=x.x numpy cython libpython m2w64-toolchain`
 
 ### pip
 
@@ -44,5 +48,4 @@ Installation via pip is also available:
 
     pip install pymecompress
 
-however you may need to first set up a build environment (gcc/mingw, as
-described for source installation) if we have yet to upload a distribution for your platform.
+although binary wheels are not available for all platforms so you may need to set up a build environment (gcc/mingw, as described for source installation) first.
