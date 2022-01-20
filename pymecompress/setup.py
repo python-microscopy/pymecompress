@@ -183,14 +183,30 @@ def configuration(parent_package = '', top_path = None):
     
     config.add_extension(name='bcl',
                     #sources=[os.path.join(cur_dir, 'bcl.pyx'), os.path.join(cur_dir, 'bcl/huffman.c'), os.path.join(cur_dir, 'quantize.c')],
-                    sources=['bcl.c', 'bcl/huffman.c','quantize.c'],
+                    sources=['bcl.c', 'bcl/huffman.c','quantize.dispatch.c', 'quantize.c'],
                     include_dirs=['bcl',] + get_numpy_include_dirs() + extra_include_dirs,
-                    extra_compile_args=['-O3', '-fno-exceptions', '-ffast-math', '-march=native', '-mtune=native'],
+                    extra_compile_args=['-O3', '-fno-exceptions', '-ffast-math',],
                     extra_link_args=linkArgs)
 
     
 
     return config
+
+
+# import distutils
+# class build_ext_subclass(distutils.command.build_ext.build_ext):
+#     def build_extensions(self):
+
+#         original__compile = self.compiler._compile
+#         def new__compile(obj, src, ext, cc_args, extra_postargs, pp_opts):
+#             if src.endswith("_AVX.c"):
+#                 extra_postargs = extra_postargs + ['-mavx',]
+#             return original__compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
+#         self.compiler._compile = new__compile
+#         try:
+#             distutils.command.build_ext.build_ext.build_extensions(self)
+#         finally:
+#             del self.compiler._compile
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
