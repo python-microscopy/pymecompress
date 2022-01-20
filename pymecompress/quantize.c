@@ -27,7 +27,7 @@
 #define NUMITERS_1 1000
 
 //#ifndef __AVX__
-/* use slower code
+/* use slower code*/
 /* square root quantize data, with a given offset and scale*/
 void quantize_u16_noavx(uint16_t *data, uint8_t * out, int size, float offset, float scale)
 {
@@ -41,6 +41,8 @@ void quantize_u16_noavx(uint16_t *data, uint8_t * out, int size, float offset, f
 }
 
 //#else
+
+#ifdef __AVX__
 /* square root quantize data, with a given offset and scale
 uses avx command set to process 16 values in parallel
 */
@@ -114,12 +116,16 @@ void quantize_u16_avx(uint16_t * data, uint8_t * out, int size, float offset, fl
     }
 }
 
-//#endif
+#endif
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#define _STR(x) #x
+#define STR(x) _STR(x)
+
+#pragma message ("GCC_VERSION=" STR(GCC_VERSION)) 
 
 /* Test for GCC > 3.2.0  - note that __builtin_cpu_supports is broken on OSX, hence we have to exclude clang*/
-#if (GCC_VERSION > 40800) && !defined(__clang__)
+#if (GCC_VERSION > 40800) //&& !defined(__clang__)
 
 void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
 {

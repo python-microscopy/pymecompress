@@ -43,6 +43,8 @@ extern "C" {
 
 int Huffman_Compress( unsigned char *in, unsigned char *out,
                       unsigned int insize );
+int Huffman_Compress_( unsigned char *in, unsigned char *out,
+                      unsigned int insize );
 void Huffman_Uncompress( unsigned char *in, unsigned char *out,
                          unsigned int insize, unsigned int outsize );
 
