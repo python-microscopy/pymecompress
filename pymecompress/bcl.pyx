@@ -2,7 +2,7 @@ import numpy as np
 #import six
 from cython.view cimport array as cvarray
 cimport cython
-from libc.stdint cimport uint16_t, uint8_t
+from libc.stdint cimport uint16_t, uint8_t, uint32_t
 from cpython cimport PyObject_CheckBuffer, PyObject_GetBuffer, PyBuffer_Release, Py_buffer, PyObject, PyBUF_SIMPLE, PyBUF_C_CONTIGUOUS, PyBUF_F_CONTIGUOUS, PyBuffer_IsContiguous
 
 cdef extern from "bcl/huffman.h":
@@ -42,6 +42,49 @@ def HuffmanCompress(data):
         
     PyBuffer_Release(&view)
     return out[:nb]
+
+@cython.boundscheck(False)
+def huffman_compress_buffer(data):
+    cdef Py_buffer buffer
+    PyObject_GetBuffer(data, &buffer, PyBUF_C_CONTIGUOUS)
+    #assert(PyBuffer_IsContiguous(buffer, 'C'))
+    cdef int nb
+    cdef int dsize = buffer.len
+    
+    out = np.zeros(int(dsize*1.01 + 320),'uint8')
+    cdef unsigned char [:] ov = out
+    
+    with nogil:
+        
+        nb = Huffman_Compress(<uint8_t *>buffer.buf, &ov[0], dsize)
+        
+    PyBuffer_Release(&buffer)
+    # store length in last 4 bytes
+    (<uint32_t *>(&ov[nb]))[0] = nb
+    return out[:(nb + 4)]
+
+@cython.boundscheck(False)
+def huffman_compress_quant_buffer(data, float offset, float scale):
+    #assert(PyBuffer_IsContiguous(buffer, 'C'))
+    cdef Py_buffer buffer
+    PyObject_GetBuffer(data, &buffer, PyBUF_C_CONTIGUOUS)
+    
+    cdef int nb
+    cdef int dsize = buffer.len
+    
+    out = np.zeros(int(dsize*1.01 + 320),'uint8')
+    quant = np.zeros(dsize, 'uint8')
+    cdef unsigned char [:] ov = out
+    cdef unsigned char [:] qv = quant
+    
+    with nogil:
+        quantize_u16(<uint16_t *>buffer.buf, &qv[0], dsize, offset, scale)
+        nb = Huffman_Compress(&qv[0], &ov[0], dsize)
+        
+    PyBuffer_Release(&buffer)
+    # store length in last 4 bytes
+    (<uint32_t *>(&ov[nb]))[0] = nb
+    return out[:(nb + 4)]
 
 @cython.boundscheck(False)
 def HuffmanCompressQuant(data, float offset, float scale):
@@ -92,4 +135,25 @@ def HuffmanDecompress(unsigned char[:] data, unsigned int outsize):
         Huffman_Uncompress(&data[0], &ov[0], insize, outsize)
     return out
     
+@cython.boundscheck(False)
+def huffman_decompress_buffer(data,  out):
+    cdef Py_buffer buffer
+    PyObject_GetBuffer(data, &buffer, PyBUF_C_CONTIGUOUS)
+    cdef Py_buffer outb
+    #assert(PyBuffer_IsContiguous(data, 'C'))
+    cdef int outlen = (<uint32_t *>(&(<uint8_t *>buffer.buf)[buffer.len-4]))[0]
     
+    if out is None:
+        out = np.zeros(outlen, 'uint8')
+    
+    PyObject_GetBuffer(out, &outb, PyBUF_C_CONTIGUOUS)
+    assert(outb.len == outlen)
+    
+    with nogil:
+        Huffman_Uncompress(<uint8_t *>buffer.buf, <uint8_t *>outb.buf, buffer.len-4, outb.len)
+    
+    PyBuffer_Release(&buffer)
+    PyBuffer_Release(&outb)
+    
+    return out
+       
