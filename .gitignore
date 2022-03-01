@@ -93,3 +93,5 @@ ENV/
 
 .idea
 
+pymecompress/quantize.dispatch.avx.c
+pymecompress/quantize.dispatch.h
