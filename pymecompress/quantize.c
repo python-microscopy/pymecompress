@@ -9,11 +9,12 @@
 #include <stdlib.h>
 #include <math.h>
 //#include <x86intrin.h>
-#include <immintrin.h>
+
 #include "quantize.h"
 
 #ifdef __AVX__
 #pragma message "AVX defined"
+#include <immintrin.h>
 #endif
 
 #ifdef __AVX2__
@@ -125,11 +126,11 @@
 #pragma message ("GCC_VERSION=" STR(GCC_VERSION)) 
 
 /* Test for GCC > 3.2.0  - note that __builtin_cpu_supports is broken on OSX, hence we have to exclude clang*/
-#if (GCC_VERSION > 40200) //&& !defined(__clang__)
+#if (GCC_VERSION > 40200) && !defined(__aarch64__) //&& !defined(__clang__)
 
 void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
 {
-    if (__builtin_cpu_supports ("avx"))
+    if (__builtin_cpu_supports("avx"))
     {
         printf("Using AVX optimsed code\n");
         _quantize_u16_AVX(data, out, size, offset, scale);
@@ -140,7 +141,10 @@ void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float s
 }
 
 #else
+    #ifndef __aarch64__
     #warning Using an old version of GCC - runtime avx detection disabled and compiling for native architecture. Please use GCC > 4.8
+    #endif
+
     #ifndef __AVX__
         void quantize_u16(uint16_t *data, uint8_t * out, int size, float offset, float scale)
         {

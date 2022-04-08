@@ -11,13 +11,14 @@
 #include <stdlib.h>
 #include <math.h>
 //#include <x86intrin.h>
-#include <immintrin.h>
+
 #include "quantize.h"
 
 #include "numpy/utils.h"
 
 #ifdef __AVX__
 #pragma message "AVX defined"
+#include <immintrin.h>
 #endif
 
 #ifdef __AVX2__
