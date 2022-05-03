@@ -8,6 +8,18 @@
 #
 #
 ##################
+from numpy.distutils.command import build_ext, build_src
+import os
+
+#Monkey-patch to generate directory for dispatch headers. NOTE - this is fixed in current numpy head (3/4/2022), but not in latest
+#release (1.22.x)
+class bsrc(build_src.build_src):
+    def finalize_options(self):
+        super().finalize_options()
+        print('build_src: ', getattr(self, 'build_src', None))
+
+        os.makedirs(os.path.join(getattr(self, 'build_src'), 'pymecompress'), exist_ok=True)
+        #print('build_temp: ', getattr(self, 'build_temp', None))
 
 def configuration(parent_package='', top_path=None):
     if os.path.exists('MANIFEST'):
@@ -55,7 +67,7 @@ if __name__ == '__main__':
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
         ],
-        cmdclass={'sdist': sdist},
+        cmdclass={'sdist': sdist, 'build_src':bsrc},
         configuration=configuration)
     
     
