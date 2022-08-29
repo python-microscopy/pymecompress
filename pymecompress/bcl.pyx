@@ -50,6 +50,7 @@ def huffman_compress_buffer(data):
     #assert(PyBuffer_IsContiguous(buffer, 'C'))
     cdef int nb
     cdef int dsize = buffer.len
+    cdef int orig_size = int(buffer.len/buffer.itemsize)
     
     out = np.zeros(int(dsize*1.01 + 320),'uint8')
     cdef unsigned char [:] ov = out
@@ -60,7 +61,7 @@ def huffman_compress_buffer(data):
         
     PyBuffer_Release(&buffer)
     # store length in last 4 bytes
-    (<uint32_t *>(&ov[nb]))[0] = nb
+    (<uint32_t *>(&ov[nb]))[0] = orig_size
     return out[:(nb + 4)]
 
 @cython.boundscheck(False)
@@ -71,6 +72,7 @@ def huffman_compress_quant_buffer(data, float offset, float scale):
     
     cdef int nb
     cdef int dsize = buffer.len
+    cdef int orig_size = int(buffer.len/buffer.itemsize)
     
     out = np.zeros(int(dsize*1.01 + 320),'uint8')
     quant = np.zeros(dsize, 'uint8')
@@ -83,7 +85,7 @@ def huffman_compress_quant_buffer(data, float offset, float scale):
         
     PyBuffer_Release(&buffer)
     # store length in last 4 bytes
-    (<uint32_t *>(&ov[nb]))[0] = nb
+    (<uint32_t *>(&ov[nb]))[0] = orig_size
     return out[:(nb + 4)]
 
 @cython.boundscheck(False)
@@ -142,6 +144,7 @@ def huffman_decompress_buffer(data,  out):
     cdef Py_buffer outb
     #assert(PyBuffer_IsContiguous(data, 'C'))
     cdef int outlen = (<uint32_t *>(&(<uint8_t *>buffer.buf)[buffer.len-4]))[0]
+    print('outlen:', outlen)
     
     if out is None:
         out = np.zeros(outlen, 'uint8')

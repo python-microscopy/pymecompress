@@ -35,7 +35,7 @@ class HuffmanQuant16(Codec):
         return bcl.huffman_compress_quant_buffer(buf, self._offset, self._scale)
     
     def decode(self, buf, out=None):
-        ret = bcl.huffman_decompress_buffer(buf, None)
+        ret = bcl.huffman_decompress_buffer(buf, None).astype('uint16')
         
         ret = (ret*ret)/self._scale + self._offset
         
@@ -44,7 +44,7 @@ class HuffmanQuant16(Codec):
         else:
            out[:] = ret
         
-        return out
+        return out.astype('uint16')
     
     def get_config(self):
         return {'codec_id': self.codec_id,
