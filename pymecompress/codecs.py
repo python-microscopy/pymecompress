@@ -7,7 +7,7 @@ from numcodecs.abc import Codec
 
 
 class Huffman(Codec):
-    codec_id='pymecompress.huffman'
+    codec_id='pymecompress-huffman'
     
     def encode(self, buf):
         return bcl.huffman_compress_buffer(buf)
@@ -25,7 +25,7 @@ class Huffman(Codec):
 numcodecs.register_codec(Huffman)
 
 class HuffmanQuant16(Codec):
-    codec_id = 'pymecompress.quant16'
+    codec_id = 'pymecompress-quant16'
     
     def __init__(self, offset=0, scale=1):
         self._offset = offset

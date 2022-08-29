@@ -6,7 +6,7 @@
 
 Compression for photon-noise limited images which keeps losses within the Poisson noise envelope
 
-PYMECompress consists of three parts: 
+PYMECompress consists of four parts: 
 
 - a fork of the Basic Compression Library originally by Marcus Geelnard, 
 modified to include a heavily optimized huffman coder (BCL license is avalable under pymecompress/bcl/doc/manual.pdf and would appear to be BSD compatible)
@@ -14,6 +14,8 @@ modified to include a heavily optimized huffman coder (BCL license is avalable u
 - a fast, AVX optimized, quantizer to perform "within noise level" quantization of photon-limited images
 
 - a python wrapper of the above. Note that at this point, only huffman coding and quantization are exposed to python
+
+- numcodecs codecs (experimental) to permit simple usage with other IO packages - e.g. Zarr
 
 Together they offer a single core throughput of ~500 -600MB/s
 
@@ -49,3 +51,59 @@ Installation via pip is also available:
     pip install pymecompress
 
 although binary wheels are not available for all platforms so you may need to set up a build environment (gcc/mingw, as described for source installation) first.
+
+## Usage
+
+### numcodecs codecs
+
+```python
+import numpy as np
+from pymecompress import codecs
+
+# vanilla huffman coding (lossless). NB - input buffer must be bytes/uint8
+huff = codecs.Huffman()
+d = np.ones(1000)
+assert np.allclose(huff.decode(huff.encode(d.view('uint8'))).view(d.dtype), d)
+
+
+# with quantisation NB: input data type MUST be uint16
+huffq = codecs.HuffmanQuant16(offset=0, scale=1.0)
+ds = np.linspace(1,2**15).astype('uint16')
+
+assert np.all((huffq.decode(huffq.encode(ds)) - ds.astype('f')) < np.sqrt(ds))
+
+```
+
+### As a Zarr compression filter
+
+VERY EXPERIMENTAL! 
+
+This is not yet well tested, but should work as described in https://zarr.readthedocs.io/en/stable/api/codecs.html. In brief ...
+
+```python
+import zarr
+from pymecompress import codecs
+z = zarr.zeros(1000000, dtype='uint16', compressor=codecs.HuffmanQuant16(offset=0, scale=1))
+
+```
+
+**NB** To be able to read/open files saved using the pymecompress codecs you will probably need to run `from pymecompress import codecs`
+to register the codecs with `numcodecs` before trying to open the file.
+
+### Directly calling functions
+
+As you need to supply the original size to the decompression function, these are most suitable when putting the compressed data in an external wrapper e.g. PYMEs' PZFFormat which keeps track of the original data dimensions and dtype (we save a couple of bytes and a seek over using the codec versions above). 
+
+```python
+
+import numpy as np
+import pymecompress
+
+data = np.linspace(1,2**15).astype('uint16')
+
+nbytes = data.nbytes
+c = pymecompress.HuffmanCompressQuant(data, quantizationOffset, quantizationScale).to_string()
+decompressed = pymecompress.HuffmanDecompress(np.fromstring(c, 'u1'), nbytes)
+dequantized = (quantisationScale*decompressed)**2 + quantizationOffset
+
+```

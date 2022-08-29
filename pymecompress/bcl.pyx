@@ -144,7 +144,7 @@ def huffman_decompress_buffer(data,  out):
     cdef Py_buffer outb
     #assert(PyBuffer_IsContiguous(data, 'C'))
     cdef int outlen = (<uint32_t *>(&(<uint8_t *>buffer.buf)[buffer.len-4]))[0]
-    print('outlen:', outlen)
+    #print('outlen:', outlen)
     
     if out is None:
         out = np.zeros(outlen, 'uint8')
