@@ -63,9 +63,11 @@ if __name__ == '__main__':
             'Development Status :: 3 - Alpha',
             # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
             'License :: OSI Approved :: BSD License', # Again, pick a license
-            'Programming Language :: Python :: 2.7', #Specify which python versions that you want to support
+            #'Programming Language :: Python :: 2.7', #Specify which python versions that you want to support
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
         ],
         cmdclass={'sdist': sdist, 'build_src':bsrc},
         configuration=configuration)
