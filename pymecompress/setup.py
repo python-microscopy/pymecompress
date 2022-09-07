@@ -69,6 +69,7 @@ def link(self,
                 build_temp,
                 target_lang)
         if self.gcc_version < "3.0.0":
+            import distutils
             func = distutils.cygwinccompiler.CygwinCCompiler.link
         else:
             func = UnixCCompiler.link
