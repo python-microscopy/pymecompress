@@ -33,11 +33,11 @@ jobs:
         python setup.py sdist
         python -m twine upload --skip-existing dist/*
     
-  deploy_wheel:
+  deploy_wheel_mac:
     needs: deploy_source #don't build wheels unless we successfully built source package.
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [macos-latest]
         python: ['3.7', '3.8', '3.9'] #,2.7] - # 2.7 disabled for now due to missing VC9
 
     runs-on: ${{ matrix.os }}
@@ -52,6 +52,34 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies
+      run: |
+        conda install setuptools wheel twine cython numpy pyyaml
+        #python -m pip install --upgrade pip
+        #pip install setuptools wheel twine cython numpy==1.14 pyyaml
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py bdist_wheel
+        twine upload --skip-existing dist/*
+
+  deploy_wheel_win:
+    needs: deploy_source #don't build wheels unless we successfully built source package.
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python: ['3.7', '3.8', '3.9'] #,2.7] - # 2.7 disabled for now due to missing VC9
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
         conda install setuptools wheel twine cython numpy pyyaml
