@@ -1,5 +1,5 @@
 # PYMECompress
-![testing](https://img.shields.io/azure-devops/tests/davidbaddeleynz/pyme-ci/1/master?logo=azuredevops)
+![testing](https://github.com/python-microscocopy/pymecompress/actions/workflows/test.yml/badge.svg)
 ![conda](https://img.shields.io/conda/v/david_baddeley/pymecompress)
 ![pypi](https://img.shields.io/pypi/v/pymecompress)
 ![pyversions](https://img.shields.io/pypi/pyversions/pymecompress)
