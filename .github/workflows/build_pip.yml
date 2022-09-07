@@ -82,7 +82,7 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
-        conda install setuptools wheel twine cython numpy pyyaml
+        conda install setuptools wheel twine cython numpy pyyaml libpython m2w64-toolchain
         #python -m pip install --upgrade pip
         #pip install setuptools wheel twine cython numpy==1.14 pyyaml
     - name: Build and publish
@@ -90,5 +90,6 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
+        python setup.py build --compiler=m2w64-toolchain
         python setup.py bdist_wheel
         twine upload --skip-existing dist/*
