@@ -16,7 +16,7 @@ class Huffman(Codec):
         return bcl.huffman_decompress_buffer(buf, out)
         
     def get_config(self):
-        return {'codec_id': self.codec_id}
+        return {'id': self.codec_id}
     
     @classmethod
     def from_config(cls, config):
@@ -47,7 +47,7 @@ class HuffmanQuant16(Codec):
         return out.astype('uint16')
     
     def get_config(self):
-        return {'codec_id': self.codec_id,
+        return {'id': self.codec_id,
                 'offset': self._offset, 'scale' : self._scale}
     
     @classmethod
