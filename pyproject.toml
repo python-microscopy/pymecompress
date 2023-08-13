@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "numpy==1.21", "cython"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymecompress"
+version = "0.3.6"
+authors = [
+  { name="David Baddeley", email="d.baddeley@auckland.ac.nz" },
+]
+description = "Compression for photon-noise limited images which keeps losses within the Poisson noise envelope"
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/python-microscopy/pymecompress"
