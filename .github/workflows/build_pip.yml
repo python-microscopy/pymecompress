@@ -8,69 +8,74 @@ on:
 
 jobs:
   deploy_source:
-    runs-on: 'ubuntu-latest'
-    
+    runs-on: 'macos-latest'
+
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.8
-    - name: Add conda to system path
+        python-version: '3.11'
+    - name: Install build dependencies
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
+        python -m pip install --upgrade pip
+        pip install build twine
+    - name: Build source distribution
       run: |
-        conda install setuptools wheel twine cython numpy pyyaml
-        #python -m pip install --upgrade pip
-        #pip install setuptools wheel twine cython numpy==1.14 pyyaml
-    - name: Build and publish
+        python -m build --sdist
+    - name: Publish source distribution
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist
-        python -m twine upload --skip-existing dist/*
+        twine upload --skip-existing dist/*.tar.gz
     
   deploy_wheel_mac:
     needs: deploy_source #don't build wheels unless we successfully built source package.
     strategy:
       matrix:
-        os: [macos-latest]
-        python: ['3.7', '3.8', '3.9'] #,2.7] - # 2.7 disabled for now due to missing VC9
+        os: [macos-latest] #, ubuntu-latest]
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        arch: [x86_64, arm64]
+        exclude:
+          - os: windows-latest
+            arch: arm64
+          - os: ubuntu-latest
+            arch: arm64
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - name: Add conda to system path
+    - name: Install build dependencies
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
+        python -m pip install --upgrade pip
+        pip install build twine
+    - name: Build wheel
+      shell: bash
       run: |
-        conda install setuptools wheel twine cython numpy pyyaml
-        #python -m pip install --upgrade pip
-        #pip install setuptools wheel twine cython numpy==1.14 pyyaml
-    - name: Build and publish
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          arch -${{ matrix.arch }} python -m build --wheel
+        else
+          python -m build --wheel
+        fi
+    - name: Publish wheel
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py bdist_wheel
-        twine upload --skip-existing dist/*
+        twine upload --skip-existing dist/*.whl
 
   deploy_wheel_win:
     needs: deploy_source #don't build wheels unless we successfully built source package.
     strategy:
       matrix:
         os: [windows-latest]
-        python: ['3.7', '3.8', '3.9'] #,2.7] - # 2.7 disabled for now due to missing VC9
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13'] #,2.7] - # 2.7 disabled for now due to missing VC9
 
     runs-on: ${{ matrix.os }}
 
@@ -82,14 +87,13 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: |
-        conda install setuptools wheel twine cython numpy pyyaml libpython m2w64-toolchain
-        #python -m pip install --upgrade pip
-        #pip install setuptools wheel twine cython numpy==1.14 pyyaml
+        conda install wheel twine cython numpy pyyaml libpython m2w64-toolchain
+        python -m pip install --upgrade build meson meson-python
+        
     - name: Build and publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        mv setup.cfg.win setup.cfg
-        python setup.py bdist_wheel
+        python -m build --wheel --no-isolation -Csetup-args="--native-file=mingw_native.ini"
         twine upload --skip-existing dist/*
