@@ -1,6 +1,8 @@
 [build-system]
-requires = ["setuptools>=61.0", "numpy==1.21", "cython"]
-build-backend = "setuptools.build_meta"
+#requires = ["setuptools>=61.0", "numpy==1.21", "cython"]
+#build-backend = "setuptools.build_meta"
+build-backend = 'mesonpy'
+requires = ['meson-python', 'numpy', 'cython']
 
 [project]
 name = "pymecompress"
