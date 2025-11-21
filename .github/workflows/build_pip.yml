@@ -95,5 +95,5 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python -m build --wheel --no-isolation -Csetup-args="--native-file=mingw_native.ini"
+        python -m build --wheel --no-isolation -Csetup-args="--native-file=${{ github.workspace }}\mingw_native.ini"
         twine upload --skip-existing dist/*
