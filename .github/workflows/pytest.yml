@@ -1,0 +1,72 @@
+name: Run Tests
+
+on:
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        include:
+          # Windows builds require mingw/gcc (MSVC cannot compile the AVX intrinsics).
+          # Use conda + m2w64-toolchain to match the wheel build workflow.
+          - os: windows-latest
+            python-version: '3.10'
+          - os: windows-latest
+            python-version: '3.11'
+          - os: windows-latest
+            python-version: '3.12'
+          - os: windows-latest
+            python-version: '3.13'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Linux / macOS: plain pip install ---
+      - name: Set up Python ${{ matrix.python-version }} (non-Windows)
+        if: runner.os != 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install build dependencies (non-Windows)
+        if: runner.os != 'Windows'
+        run: pip install meson-python meson ninja numpy cython pytest
+
+      - name: Build and install (non-Windows)
+        if: runner.os != 'Windows'
+        run: pip install . --no-build-isolation
+
+      # --- Windows: conda + mingw so gcc is used instead of MSVC ---
+      - name: Set up conda + Python ${{ matrix.python-version }} (Windows)
+        if: runner.os == 'Windows'
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          auto-activate-base: false
+          activate-environment: test
+
+      - name: Install build dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: bash -el {0}
+        run: |
+          conda install -y numpy cython libpython m2w64-toolchain
+          pip install meson-python meson ninja pytest
+
+      - name: Build and install (Windows)
+        if: runner.os == 'Windows'
+        shell: bash -el {0}
+        run: |
+          pip install . --no-build-isolation \
+            -Csetup-args="--native-file=${{ github.workspace }}/mingw_native.ini"
+
+      # --- Run tests ---
+      - name: Run tests
+        shell: bash -el {0}
+        run: pytest test_pymecompress.py -v

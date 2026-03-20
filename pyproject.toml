@@ -21,3 +21,6 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/python-microscopy/pymecompress"
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"

@@ -1,5 +1,5 @@
 # PYMECompress
-![testing](https://github.com/python-microscocopy/pymecompress/actions/workflows/test.yml/badge.svg)
+![testing](https://github.com/python-microscopy/pymecompress/actions/workflows/pytest.yml/badge.svg)
 ![conda](https://img.shields.io/conda/v/david_baddeley/pymecompress)
 ![pypi](https://img.shields.io/pypi/v/pymecompress)
 ![pyversions](https://img.shields.io/pypi/pyversions/pymecompress)
