@@ -10,6 +10,12 @@ jobs:
   deploy_source:
     runs-on: 'macos-latest'
 
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pymecompress
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -19,16 +25,14 @@ jobs:
     - name: Install build dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install build
     - name: Build source distribution
       run: |
         python -m build --sdist
     - name: Publish source distribution
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload --skip-existing dist/*.tar.gz
+      uses: pypa/gh-action-pypi-publish@v1.14.3
+      with:
+        skip-existing: true
     
   deploy_wheel_mac:
     needs: deploy_source #don't build wheels unless we successfully built source package.
@@ -45,6 +49,12 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pymecompress
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -54,7 +64,7 @@ jobs:
     - name: Install build dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install build
     - name: Build wheel
       shell: bash
       run: |
@@ -64,11 +74,9 @@ jobs:
           python -m build --wheel
         fi
     - name: Publish wheel
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload --skip-existing dist/*.whl
+      uses: pypa/gh-action-pypi-publish@v1.14.3
+      with:
+        skip-existing: true
 
   deploy_wheel_win:
     needs: deploy_source #don't build wheels unless we successfully built source package.
@@ -79,21 +87,36 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pymecompress
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
       uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: ${{ matrix.python }}
-    - name: Install dependencies
+    - name: Install dependencies # uses conda specifically to get mingw64 toolchain and a non-msvc complier (as code uses gcc specific AVX intrinsics)
       run: |
-        conda install wheel twine cython numpy pyyaml libpython m2w64-toolchain
-        python -m pip install --upgrade build meson meson-python
-        
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        conda install wheel cython numpy pyyaml libpython m2w64-toolchain
+        python -m pip install --upgrade build meson meson-python      
+    - name: Build wheel
       run: |
         python -m build --wheel --no-isolation -Csetup-args="--native-file=${{ github.workspace }}\mingw_native.ini"
-        twine upload --skip-existing dist/*
+    
+    # Publish wheel using gh-action-pypi-publish
+    - name: Publish wheel
+      uses: pypa/gh-action-pypi-publish@v1.14.3
+      with:
+        skip-existing: true
+
+    # - name: Build and publish
+    #   env:
+    #     TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+    #     TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+    #   run: |
+    #     python -m build --wheel --no-isolation -Csetup-args="--native-file=${{ github.workspace }}\mingw_native.ini"
+    #     twine upload --skip-existing dist/*
