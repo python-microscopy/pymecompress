@@ -6,7 +6,7 @@ requires = ['meson-python', 'numpy', 'cython']
 
 [project]
 name = "pymecompress"
-version = "0.3.6b"
+version = "0.3.7"
 authors = [
   { name="David Baddeley", email="d.baddeley@auckland.ac.nz" },
 ]
