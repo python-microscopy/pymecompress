@@ -10,12 +10,6 @@ jobs:
   deploy_source:
     runs-on: 'macos-latest'
 
-    environment:
-      name: pypi
-      url: https://pypi.org/p/pymecompress
-    permissions:
-      id-token: write  # mandatory for trusted publishing
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -29,10 +23,11 @@ jobs:
     - name: Build source distribution
       run: |
         python -m build --sdist
-    - name: Publish source distribution
-      uses: pypa/gh-action-pypi-publish@v1.14.3
+    - name: Upload source distribution
+      uses: actions/upload-artifact@v4
       with:
-        skip-existing: true
+        name: dist-sdist
+        path: dist/*.tar.gz
     
   deploy_wheel_mac:
     needs: deploy_source #don't build wheels unless we successfully built source package.
@@ -48,12 +43,6 @@ jobs:
             arch: arm64
 
     runs-on: ${{ matrix.os }}
-
-    environment:
-      name: pypi
-      url: https://pypi.org/p/pymecompress
-    permissions:
-      id-token: write  # mandatory for trusted publishing
 
     steps:
     - uses: actions/checkout@v2
@@ -73,10 +62,11 @@ jobs:
         else
           python -m build --wheel
         fi
-    - name: Publish wheel
-      uses: pypa/gh-action-pypi-publish@v1.14.3
+    - name: Upload wheel
+      uses: actions/upload-artifact@v4
       with:
-        skip-existing: true
+        name: dist-mac-${{ matrix.python }}-${{ matrix.arch }}
+        path: dist/*.whl
 
   deploy_wheel_win:
     needs: deploy_source #don't build wheels unless we successfully built source package.
@@ -86,12 +76,6 @@ jobs:
         python: ['3.11', '3.12', '3.13', '3.13','3.14', '3.15'] #,2.7] - # 2.7 disabled for now due to missing VC9
 
     runs-on: ${{ matrix.os }}
-
-    environment:
-      name: pypi
-      url: https://pypi.org/p/pymecompress
-    permissions:
-      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
 
     steps:
     - uses: actions/checkout@v3
@@ -106,9 +90,33 @@ jobs:
     - name: Build wheel
       run: |
         python -m build --wheel --no-isolation -Csetup-args="--native-file=${{ github.workspace }}\mingw_native.ini"
-    
-    # Publish wheel using gh-action-pypi-publish
-    - name: Publish wheel
+    - name: Upload wheel
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-win-${{ matrix.python }}
+        path: dist/*.whl
+
+  # gh-action-pypi-publish only runs on Linux, so publish everything from one job.
+  publish:
+    needs: [deploy_source, deploy_wheel_mac, deploy_wheel_win]
+    # Uncomment to publish whatever built even if some matrix jobs failed:
+    # if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pymecompress
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+
+    steps:
+    - name: Download all distributions
+      uses: actions/download-artifact@v4
+      with:
+        pattern: dist-*
+        path: dist
+        merge-multiple: true
+    - name: Publish distributions
       uses: pypa/gh-action-pypi-publish@v1.14.3
       with:
         skip-existing: true
